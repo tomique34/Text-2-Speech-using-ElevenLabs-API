@@ -22,7 +22,7 @@ Linkedin: https://www.linkedin.com/in/tomasvince/
 3. Create virtual environment using following commands: `python3 -m venv venv` 
 4. Activate virtual environment using following commands: `source venv/bin/activate` 
 5. Install the required Python packages with `pip install -r requirements.txt`.
-6. Rename file '.env.EXAMPLE' to ".env", open renamed file and set up your OpenAI API key. **(This step is required)**
+6. Rename file '.env.EXAMPLE' to ".env", open renamed file and set up your ElevenLabs API key. **(This step is required)**
 7. Place the text you want to convert to speech in a file named "text-for-conversion.txt" and save. *(This step is required if you want to run text to speech conversion via CLI using dedicated python script tts-app.py)*
 8. To run text-2-speech converter tool in more convenient way (via web ui) take a look at section **3. Streamlit web framework** for more details how to run Streamlit web framework.
 9. Additional way (most convenient way) how to run converter tool is by running docker container. See **4. Run Text-2-Speech app as Docker container** section for technical details how to make it done.
@@ -35,7 +35,7 @@ Run the application with `python3 tts-app.py`.
 
 To create a Streamlit web application that incorporates the functionality of created Python script to convert text to an MP3 file, follow these steps. 
 
-*Note: This guide assumes you have Streamlit and the necessary libraries (like openai) installed in your environment.*
+*Note: This guide assumes you have Streamlit and the necessary libraries (like ElevenLabs) installed in your environment.*
 
 This script is saved in a tts-using-stramlit.py file and can be run using Streamlit by navigating to the directory containing the script and running: 
 `streamlit run tts-app-streamlit.py`
