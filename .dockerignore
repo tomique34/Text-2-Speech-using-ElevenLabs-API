@@ -1,0 +1,26 @@
+# Ignore .env files to prevent sensitive data from being included in the Docker image
+.env
+
+# Ignore Python virtual environment directories
+venv
+__pycache__
+tts-env
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+
+# Ignore Git directory and files
+.git
+.gitignore
+
+# Ignore log files
+*.log
+
+# Ignore all markdown files
+*.md
+
+# Ignore all local configuration files
+*.cfg
