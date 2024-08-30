@@ -10,6 +10,18 @@ from dotenv import load_dotenv
 from datetime import datetime
 from elevenlabs.client import ElevenLabs
 
+# To handle warnings related to no supported SSL module
+import warnings
+from urllib3.exceptions import NotOpenSSLWarning
+warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
+
+# Suppress specific warnings - if ignoring of warning messages is enabled, script stops working. if disabled, warning messages appear, but script is running correctly.
+#from pydantic._internal._config import UserWarning as PydanticUserWarning
+#from pydantic._internal._fields import UserWarning as PydanticFieldWarning
+#warnings.filterwarnings("ignore", message="Valid config keys have changed in V2:")
+#warnings.filterwarnings("ignore", message="Field .* has conflict with protected namespace .*")
+# End area, where warning messages are handled/ignored
+
 # Load environment variables from .env file
 load_dotenv()
 

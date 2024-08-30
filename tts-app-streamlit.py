@@ -10,9 +10,22 @@ from dotenv import load_dotenv
 from datetime import datetime
 from elevenlabs.client import ElevenLabs
 import streamlit as st
+import pydantic as pydantic
 
 # Suppress DeprecationWarning
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# To handle warnings related to no supported SSL module
+import warnings
+from urllib3.exceptions import NotOpenSSLWarning
+warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
+
+# Suppress specific warnings
+#from pydantic._internal._config import UserWarning as PydanticUserWarning
+#from pydantic._internal._fields import UserWarning as PydanticFieldWarning
+#warnings.filterwarnings("ignore", category=PydanticUserWarning)
+#warnings.filterwarnings("ignore", category=PydanticFieldWarning)
+# End area, where warning messages are handled/ignored
 
 # Set page title, favicon, and description
 st.set_page_config(
