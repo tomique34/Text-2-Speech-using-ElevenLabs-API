@@ -44,7 +44,21 @@ client = ElevenLabs(api_key=elevenlabs_api_key)
 voice_names = []
 
 # List all available Elevenlabs voices and print their details.
-supported_voices = client.voices.get_all()
+#supported_voices = client.voices.get_all()
+
+try:
+    supported_voices = client.voices.get_all()
+except pydantic.ValidationError as e:
+    st.error("Failed to fetch voices. Please check the API key and try again.")
+    supported_voices = None
+
+if supported_voices is not None:
+    for voice in supported_voices.voices:  # Accessing the voices attribute directly
+        gender = voice.labels.get('gender', 'Unknown')
+        voice_names.append(voice.name)
+else:
+    st.error("No voices available. Please check your API response.")
+
 # print("\n")
 # print("***************************************************")
 # print("Available Elevenlabs voices:")

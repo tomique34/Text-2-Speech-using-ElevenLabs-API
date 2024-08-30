@@ -1,6 +1,6 @@
 # Text-2-Speech-using-ElevenLabs-API
 
-This application uses the OpenAI API to convert text to speech and save the audio file as mp3 to local disk.
+This application uses the OpenAI or Elevenlabs API to convert text to speech and save the audio file as mp3 to local disk.
 
 ## Author
 

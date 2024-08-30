@@ -28,11 +28,30 @@ client = ElevenLabs(api_key=elevenlabs_api_key)
 # Define the path to the text file
 text_file_path = Path(__file__).parent / "text-for-conversion.txt"
 
-# Initialize an empty list to hold the voice names for Streamlit dropdown menu options
-voice_names = []
+
+
 
 # List all available Elevenlabs voices and print their details.
-supported_voices = client.voices.get_all()
+#supported_voices = client.voices.get_all()
+
+try:
+    supported_voices = client.voices.get_all()
+except pydantic.ValidationError as e:
+    print("Failed to parse response: ", e)
+    supported_voices = None
+
+if supported_voices is not None:
+    voice_names = []
+    for voice in supported_voices.voices:  # Accessing the voices attribute directly
+        gender = voice.labels.get('gender', 'Unknown')
+        voice_names.append(voice.name)
+        print(f"Voice ID: {voice.voice_id}, Name: {voice.name}, Category: {voice.category}, Gender: {gender}")
+    
+    if not voice_names:
+        print("No voices found, please check the API response structure.")
+else:
+    print("No valid voices data retrieved.")
+
 # print("\n")
 # print("***************************************************")
 # print("Available Elevenlabs voices:")
