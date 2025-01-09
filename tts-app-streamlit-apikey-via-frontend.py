@@ -204,6 +204,8 @@ def cleanup_files(directory, max_age=600):
     """
     Remove files in the specified directory that are older than max_age seconds.
     """
+    if not os.path.exists(directory):
+        return  # Exit if the directory doesn't exist
     for filename in os.listdir(directory):
         file_path = Path(directory) / filename
         if file_path.is_file() and file_path.stat().st_mtime < time.time() - max_age:
