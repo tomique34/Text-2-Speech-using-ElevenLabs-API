@@ -39,6 +39,7 @@ if key_entered:
     if elevenlabs_api_key:
         # Perform actions that require the API key
         st.sidebar.success("API key has been registered successfully.")
+        st.session_state['elevenlabs_api_key'] = elevenlabs_api_key
     else:
         st.sidebar.error("Please enter an valid Elevenlabs API key to proceed..")
         # Prevent the rest of the code from executing
