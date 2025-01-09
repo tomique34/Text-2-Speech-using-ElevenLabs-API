@@ -1,1 +1,1 @@
-Toto je text na odtestovanie funkčnosti  Elevenlabs API rozhrania
+This is sample text for testing text to speech functionality.
