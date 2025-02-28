@@ -6,7 +6,6 @@ import time
 import warnings
 from dotenv import load_dotenv
 from datetime import datetime
-from elevenlabs.client import ElevenLabs
 import streamlit as st
 
 # Suppress DeprecationWarning
@@ -47,146 +46,90 @@ if key_entered:
 
 # Now we check if the API key is in the session state before making any API calls
 if 'elevenlabs_api_key' in st.session_state and st.session_state['elevenlabs_api_key']:
-    client = ElevenLabs(api_key=st.session_state['elevenlabs_api_key'])
     try:
-        # Proceed with API calls and other operations that require the API key
-        # ...
-        # Initialize an empty list to hold the voice names for Streamlit dropdown menu options
-        voice_names = []
+        from elevenlabs.client import ElevenLabs
+        client = ElevenLabs(api_key=st.session_state['elevenlabs_api_key'])
+        
+        # Test API connection by fetching voices
+        try:
+            # Proceed with API calls and other operations that require the API key
+            # Initialize an empty list to hold the voice names for Streamlit dropdown menu options
+            voice_names = []
 
-        # List all available Elevenlabs voices and add their names to the dropdown options
-        supported_voices = client.voices.get_all()
-        for voice in supported_voices.voices:
-            voice_names.append(voice.name)
+            # List all available Elevenlabs voices and add their names to the dropdown options
+            supported_voices = client.voices.get_all()
+            for voice in supported_voices.voices:
+                voice_names.append(voice.name)
 
-        # Dropdown menu for voice selection
-        selected_voice = st.selectbox("Choose a voice for speech generation:", voice_names)
+            # Dropdown menu for voice selection
+            selected_voice = st.selectbox("Choose a voice for speech generation:", voice_names)
 
-        # Text area for user input
-        user_input_text = st.text_area("Enter the text you want to convert to speech:", height=150)
+            # Text area for user input
+            user_input_text = st.text_area("Enter the text you want to convert to speech:", height=150)
 
-        # Submit button to convert the text to speech
-        submit = st.button('Convert to Speech')
+            # Submit button to convert the text to speech
+            submit = st.button('Convert to Speech')
 
-        if submit and user_input_text:
-            # Process the conversion
-            try:
-                # Get the current date and time for filename uniqueness
-                now = datetime.now()
-                date_string = now.strftime("%Y-%m-%d_%H-%M")
-                speech_file_path = Path("audio-outputs") / f"speech-{date_string}.mp3"
+            if submit and user_input_text:
+                # Process the conversion
+                try:
+                    # Get the current date and time for filename uniqueness
+                    now = datetime.now()
+                    date_string = now.strftime("%Y-%m-%d_%H-%M")
+                    
+                    # Create directory if it doesn't exist
+                    speech_file_directory = Path(__file__).parent / "audio-outputs"
+                    speech_file_directory.mkdir(parents=True, exist_ok=True)
+                    
+                    speech_file_path = speech_file_directory / f"speech-{date_string}.mp3"
 
-                # Create directory if it doesn't exist
-                speech_file_directory = Path(__file__).parent / "audio-outputs"
-                speech_file_path.parent.mkdir(parents=True, exist_ok=True)
+                    # Generate the speech audio using Elevenlabs API from the provided text
+                    response = client.generate(
+                        text=user_input_text,
+                        voice=selected_voice,
+                        model="eleven_multilingual_v2"
+                    )
 
-                # Generate the speech audio using Elevenlabs API from the provided text
-                response = client.generate(
-                    text=user_input_text,
-                    voice=selected_voice,
-                    model="eleven_multilingual_v2"
-                )
+                    # Save the response to a file
+                    with open(speech_file_path, 'wb') as out_file:
+                        for chunk in response:
+                            out_file.write(chunk)
 
-                # Save the response to a file
-                with open(speech_file_path, 'wb') as out_file:
-                    for chunk in response:
-                        out_file.write(chunk)
+                    st.success("The audio file has been created successfully.")
 
-                st.success("The audio file has been created successfully.")
+                    # Provide a link for the user to download the MP3 file
+                    with open(speech_file_path, 'rb') as audio_file:
+                        audio_data = audio_file.read()
 
-                # Provide a link for the user to download the MP3 file
-                with open(speech_file_path, 'rb') as audio_file:
-                    audio_data = audio_file.read()
+                    st.download_button(
+                        label="Download Speech File",
+                        data=audio_data,
+                        file_name=speech_file_path.name,
+                        mime="audio/mp3"
+                    )
+                    
+                    # Display an audio player option to listen to the generated speech
+                    st.audio(audio_data, format='audio/mp3', start_time=0)
 
-                st.download_button(label="Download Speech File",
-                                data=audio_data,
-                                file_name=speech_file_path.name,
-                                mime="audio/mp3")
-                
-                # Display an audio player option to listen to the generated speech
-                st.audio(audio_data, format='audio/mp3', start_time=0)
+                except Exception as e:
+                    st.error(f"An error occurred during audio generation: {str(e)}")
+            elif submit:
+                st.error("Please enter some text to convert to speech.")
 
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
-        elif submit:
-            st.error("Please enter some text to convert to speech.")
-
-
-    except Exception as e:
-        # Handle exceptions that may occur during the API calls
-        st.error(f"An error occurred with the API: {e}")
+        except Exception as e:
+            # Handle exceptions that may occur during the API calls to fetch voices
+            st.error(f"Error fetching voices. Please check your API key: {e}")
+            # Clear the invalid API key from session state
+            st.session_state.pop('elevenlabs_api_key', None)
+            st.sidebar.error("API key validation failed. Please enter a valid key.")
+    
+    except ImportError as e:
+        st.error(f"Error importing ElevenLabs: {e}. Please ensure 'elevenlabs' is installed.")
 else:
     # Prompt the user to enter the API key
     st.info("Please enter your ElevenLabs API key on left side first to proceed.")
     # Prevent the rest of the code from executing
     st.stop()
-
-
-
-
-# Create an instance of the ElevenLabs client with the API key provided by the user
-#client = ElevenLabs(api_key=elevenlabs_api_key)
-
-# # Initialize an empty list to hold the voice names for Streamlit dropdown menu options
-# voice_names = []
-
-# # List all available Elevenlabs voices and add their names to the dropdown options
-# supported_voices = client.voices.get_all()
-# for voice in supported_voices.voices:
-#     voice_names.append(voice.name)
-
-# # Dropdown menu for voice selection
-# selected_voice = st.selectbox("Choose a voice for speech generation:", voice_names)
-
-# # Text area for user input
-# user_input_text = st.text_area("Enter the text you want to convert to speech:", height=150)
-
-# # Submit button to convert the text to speech
-# submit = st.button('Convert to Speech')
-
-# if submit and user_input_text:
-#     # Process the conversion
-#     try:
-#         # Get the current date and time for filename uniqueness
-#         now = datetime.now()
-#         date_string = now.strftime("%Y-%m-%d_%H-%M")
-#         speech_file_path = Path("audio-outputs") / f"speech-{date_string}.mp3"
-
-#         # Create directory if it doesn't exist
-#         speech_file_directory = Path(__file__).parent / "audio-outputs"
-#         speech_file_path.parent.mkdir(parents=True, exist_ok=True)
-
-#         # Generate the speech audio using Elevenlabs API from the provided text
-#         response = client.generate(
-#             text=user_input_text,
-#             voice=selected_voice,
-#             model="eleven_multilingual_v2"
-#         )
-
-#         # Save the response to a file
-#         with open(speech_file_path, 'wb') as out_file:
-#             for chunk in response:
-#                 out_file.write(chunk)
-
-#         st.success("The audio file has been created successfully.")
-
-#         # Provide a link for the user to download the MP3 file
-#         with open(speech_file_path, 'rb') as audio_file:
-#             audio_data = audio_file.read()
-
-#         st.download_button(label="Download Speech File",
-#                         data=audio_data,
-#                         file_name=speech_file_path.name,
-#                         mime="audio/mp3")
-        
-#         # Display an audio player option to listen to the generated speech
-#         st.audio(audio_data, format='audio/mp3', start_time=0)
-
-#     except Exception as e:
-#         st.error(f"An error occurred: {str(e)}")
-# elif submit:
-#     st.error("Please enter some text to convert to speech.")
-
 
 # Footer
 footer = """
